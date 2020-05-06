@@ -1,14 +1,13 @@
-package edu.hhu.construction.dao;
+package edu.hhu.construction.mapper;
 
-import edu.hhu.construction.domain.User;
-import org.apache.ibatis.annotations.Insert;
+import edu.hhu.construction.bean.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 
 @Mapper
-public interface UserDao {
+public interface UserMapper {
 
     /**
      * 根据id查询，返回User

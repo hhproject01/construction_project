@@ -14,10 +14,12 @@ public class IsMobileValidator implements ConstraintValidator<IsMobile, String> 
 	private boolean required = false;
 
 	//获取注解带来的值
+	@Override
 	public void initialize(IsMobile constraintAnnotation) {
 		required = constraintAnnotation.required();
 	}
 
+	@Override
 	public boolean isValid(String value, ConstraintValidatorContext context) {
 		if(required) {//required = true 是必须的
 			return ValidatorUtil.isMobile(value);

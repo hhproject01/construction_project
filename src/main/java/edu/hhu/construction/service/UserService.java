@@ -1,7 +1,8 @@
 package edu.hhu.construction.service;
 
-import edu.hhu.construction.dao.UserDao;
-import edu.hhu.construction.domain.User;
+import com.alibaba.druid.util.StringUtils;
+import edu.hhu.construction.mapper.UserMapper;
+import edu.hhu.construction.bean.User;
 import edu.hhu.construction.exception.GlobalException;
 import edu.hhu.construction.result.CodeMsg;
 import edu.hhu.construction.util.MD5Util;
@@ -10,17 +11,21 @@ import edu.hhu.construction.vo.LoginVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 @Service
 public class UserService {
 
 	public static final String COOKI_NAME_TOKEN = "token";
+	public static final int TOKEN_EXPIRE = 3*24*3600;
 	
 	@Autowired
-	UserDao userDao;
+	UserMapper userMapper;
 
-	public String login(HttpServletResponse response, LoginVo loginVo){
+	public String login(HttpServletRequest request, HttpServletResponse response, LoginVo loginVo){
 		if(loginVo == null) {
 			throw new GlobalException(CodeMsg.SERVER_ERROR);
 		}
@@ -42,39 +47,37 @@ public class UserService {
 		//登录成功
 		//生成cookie  UUIDUtil
 		String token = UUIDUtil.uuid(); //token对应user
-
-		//将token写入redis
-		//addCookie(response, token, user);
-
+		addCookie(response, token);
+		HttpSession session = request.getSession();
+		session.setAttribute(token, user);
 		return token;
 	}
 
 	//从DB取值
 	public User getById(long id) {
-		return userDao.getById(id);
+		return userMapper.getById(id);
 	}
 
-	//从redis取值
-/*	public User getByToken(HttpServletResponse response, String token) {
+	// 根据token获取用户信息
+	public User getByToken(HttpServletRequest request, HttpServletResponse response, String token) {
 		if(StringUtils.isEmpty(token)) {
 			return null;
 		}
 		//取出数据
-		User user = redisService.get(UserKey.token, token, User.class);
+		HttpSession session = request.getSession();
+		User user = (User)session.getAttribute(token);;
 		//延长有效期
 		if(user != null) {
-			addCookie(response, token, user);
+			addCookie(response, token);
 		}
 		return user;
-	}*/
+	}
 	
-/*	private void addCookie(HttpServletResponse response, String token, User user) {
-		//将token信息写入redis
-		redisService.set(UserKey.token, token, user);  //(prefix, key, value)
-		Cookie cookie = new Cookie(COOKI_NAME_TOKEN, token);  //(name, value)
-		cookie.setMaxAge(UserKey.token.expireSeconds());
-		cookie.setPath("/"); //在webapp文件夹下的所有应用共享cookie
+	private void addCookie(HttpServletResponse response, String token) {
+		Cookie cookie = new Cookie(COOKI_NAME_TOKEN, token);
+		cookie.setMaxAge(TOKEN_EXPIRE);
+		cookie.setPath("/");
 		response.addCookie(cookie);
-	}*/
+	}
 
 }

@@ -17,6 +17,7 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(value=Exception.class)
 	public Result<String> exceptionHandler(HttpServletRequest request, Exception e){
+
 		e.printStackTrace();
 
 		if(e instanceof GlobalException) {
@@ -30,7 +31,7 @@ public class GlobalExceptionHandler {
 			String msg = error.getDefaultMessage();
 			return Result.error(CodeMsg.BIND_ERROR.fillArgs(msg));
 
-		}else { //服务端异常
+		} else { //服务端异常
 			return Result.error(CodeMsg.SERVER_ERROR);
 		}
 	}
