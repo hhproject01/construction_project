@@ -1,6 +1,5 @@
 package edu.hhu.construction.service;
 
-import com.alibaba.druid.util.StringUtils;
 import edu.hhu.construction.mapper.UserMapper;
 import edu.hhu.construction.bean.User;
 import edu.hhu.construction.exception.GlobalException;
@@ -8,6 +7,7 @@ import edu.hhu.construction.result.CodeMsg;
 import edu.hhu.construction.util.MD5Util;
 import edu.hhu.construction.util.UUIDUtil;
 import edu.hhu.construction.vo.LoginVo;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

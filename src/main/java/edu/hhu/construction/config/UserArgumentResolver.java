@@ -1,8 +1,8 @@
 package edu.hhu.construction.config;
 
-import com.alibaba.druid.util.StringUtils;
 import edu.hhu.construction.bean.User;
 import edu.hhu.construction.service.UserService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Service;
