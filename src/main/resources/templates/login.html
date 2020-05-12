@@ -1,5 +1,6 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <title>登录</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -19,7 +20,24 @@
     <!-- common.js -->
     <script type="text/javascript" th:src="@{/js/common.js}"></script>
 
+    <style>
+        .my {
+            width: 100px;
+            height: 36px;
+            background-color: #f40;
+            line-height: 36px;
+            text-align: center;
+            color: #fff;
+            font-size: 16px;
+            margin: 30px auto;
+            cursor: pointer;
+            -webkit-user-select: none; /*禁止用户选中文字*/
+        }
+
+    </style>
+
 </head>
+
 <body>
 
 <form name="loginForm" id="loginForm" method="post" style="width:50%; margin:0 auto">
@@ -48,6 +66,28 @@
         </div>
     </div>
 
+    <div class="form-group">
+        <div class="row">
+            <label class="form-label col-md-4">请输入验证码</label>
+            <div class="col-md-5">
+                <input id="checkcode" name="checkcode" class="form-control" type="text" placeholder="验证码"
+                       required="true" />
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group" align="right">
+        <div class="row">
+            <div class="col-md-8">
+<!--                验证码-->
+                <canvas id="canvas" width="100px" height="40px" style="border: 1px solid #ccc;
+        border-radius: 5px;"></canvas>
+                <a onclick="drawPic()" href="#">看不清换一张?</a>
+            </div>
+        </div>
+    </div>
+
+
     <div class="row">
         <div class="col-md-5">
             <button class="btn btn-primary btn-block" type="reset" onclick="reset()">重置</button>
@@ -58,7 +98,90 @@
     </div>
 
 </form>
+
+<script>
+
+    //生成随机数
+    function randomNum(min,max){
+        return Math.floor(Math.random()*(max-min)+min);
+    }
+
+    //生成随机颜色RGB分量
+    function randomColor(min,max){
+        var _r = randomNum(min,max);
+        var _g = randomNum(min,max);
+        var _b = randomNum(min,max);
+        return "rgb("+_r+","+_g+","+_b+")";
+    }
+
+    //先阻止画布默认点击发生的行为再执行drawPic()方法
+    document.getElementById("canvas").onclick = function(e){
+        e.preventDefault();
+        drawPic();
+    };
+
+    function drawPic() {
+        var $canvas = document.getElementById("canvas");
+        var _str = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";//设置随机数库
+        var _picTxt = "";//随机数
+        var _num = 4;//4个随机数字
+        var _width = $canvas.width;
+        var _height = $canvas.height;
+        var ctx = $canvas.getContext("2d");//获取 context 对象
+        ctx.textBaseline = "bottom";//文字上下对齐方式--底部对齐
+        ctx.fillStyle = randomColor(180,240);//填充画布颜色
+        ctx.fillRect(0,0,_width,_height);//填充矩形--画画
+
+        /* <![CDATA[ */
+        for(var i=0; i<_num; i++){
+            var x = (_width-10)/_num*i+10;
+            var y = randomNum(_height/2,_height);
+            var deg = randomNum(-45,45);
+            var txt = _str[randomNum(0,_str.length)];
+            _picTxt += txt;//获取一个随机数
+
+            ctx.fillStyle = randomColor(10,100);//填充随机颜色
+            ctx.font = randomNum(16,40)+"px SimHei";//设置随机数大小，字体为SimHei
+            ctx.translate(x,y);//将当前xy坐标作为原始坐标
+            ctx.rotate(deg*Math.PI/180);//旋转随机角度
+            ctx.fillText(txt, 0,0);//绘制填色的文本
+            ctx.rotate(-deg*Math.PI/180);
+            ctx.translate(-x,-y);
+        }
+
+        for(var i=0; i<_num; i++){
+            //定义笔触颜色
+            ctx.strokeStyle = randomColor(90,180);
+            ctx.beginPath();
+            //随机划线--4条路径
+            ctx.moveTo(randomNum(0,_width), randomNum(0,_height));
+            ctx.lineTo(randomNum(0,_width), randomNum(0,_height));
+            ctx.stroke();
+        }
+        for(var i=0; i<_num*10; i++){
+            ctx.fillStyle = randomColor(0,255);
+            ctx.beginPath();
+            //随机画原，填充颜色
+            ctx.arc(randomNum(0,_width),randomNum(0,_height), 1, 0, 2*Math.PI);
+            ctx.fill();
+        }
+
+        /* ]]> */
+
+       /* Thymeleaf模版页面内嵌JS不能使用For循环问题,for循环前后必须加上
+        /!* <![CDATA[ *!/
+        for循环
+        /!* ]]> *!/*/
+
+        return _picTxt;//返回随机数字符串
+
+    }
+    drawPic();
+
+</script>
+
 </body>
+
 <script>
     function login() {
         $("#loginForm").validate({
@@ -66,11 +189,11 @@
                 doLogin();
             }
         });
+
     }
     function doLogin() {
         // 加载中
         g_showLoading();
-
         var inputPass = $("#password").val();
         var salt = g_passsword_salt;
         var str = "" + salt.charAt(0) + salt.charAt(2) + inputPass + salt.charAt(5) + salt.charAt(4);
@@ -82,6 +205,7 @@
             data: {
                 mobile: $("#mobile").val(),
                 password: password
+
             },
             success: function (data) {
                 layer.closeAll();
@@ -97,5 +221,8 @@
             }
         });
     }
+
+
+
 </script>
 </html>

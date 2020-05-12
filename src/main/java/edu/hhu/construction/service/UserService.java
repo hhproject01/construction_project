@@ -15,6 +15,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 
 @Service
 public class UserService {
@@ -40,10 +41,18 @@ public class UserService {
 		String dbPass = user.getPassword();
 		String saltDB = user.getSalt();
 		String calcPass = MD5Util.formPassToDBPass(formPass, saltDB);
+
 		//判断计算出来的password 和 DBpassword 是否一样
 		if(!calcPass.equals(dbPass)) {
 			throw new GlobalException(CodeMsg.PASSWORD_ERROR);
 		}
+
+/*
+		try {
+			response.sendRedirect("http://www.yanstudy.com");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}*/
 		//登录成功
 		//生成cookie  UUIDUtil
 		String token = UUIDUtil.uuid(); //token对应user
